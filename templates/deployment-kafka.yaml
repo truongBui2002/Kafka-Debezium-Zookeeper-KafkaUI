@@ -17,7 +17,7 @@ spec:
       initContainers:
         - name: init-kafka
           image: {{ .Values.kafka.image }}
-          command: ['sh', '-c', 'mkdir -p /bitnami/kafka && chown -R 1001:1001 /bitnami/kafka/*']
+          command: ['sh', '-c', 'mkdir -p /bitnami/kafka && chown -R 1001:1001 /bitnami/kafka/* && chmod -R 775 /bitnami/kafka']
           volumeMounts:
             - name: kafka-data
               mountPath: /bitnami/kafka
