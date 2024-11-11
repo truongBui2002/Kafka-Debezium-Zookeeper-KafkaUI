@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: debezium
+  labels:
+    app: debezium
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: debezium
+  template:
+    metadata:
+      labels:
+        app: debezium
+    spec:
+      containers:
+        - name: debezium
+          image: {{ .Values.debezium.image }}
+          ports:
+            - containerPort: 8083
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: "{{ .Values.debezium.config.bootstrapServers }}"
+            - name: GROUP_ID
+              value: "{{ .Values.debezium.config.groupId }}"
+            - name: CONFIG_STORAGE_TOPIC
+              value: "{{ .Values.debezium.config.configStorageTopic }}"
+            - name: OFFSET_STORAGE_TOPIC
+              value: "{{ .Values.debezium.config.offsetStorageTopic }}"
+            - name: KEY_CONVERTER
+              value: "{{ .Values.debezium.config.keyConverter }}"
+            - name: VALUE_CONVERTER
+              value: "{{ .Values.debezium.config.valueConverter }}"
+            - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
+              value: "{{ .Values.debezium.config.keyConverterSchemaRegistryUrl }}"
+            - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
+              value: "{{ .Values.debezium.config.valueConverterSchemaRegistryUrl }}"

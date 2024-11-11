@@ -1,0 +1,71 @@
+replicaCount: 1
+
+storage:
+  zookeeper: 2Gi
+  kafka: 10Gi
+
+zookeeper:
+  image: bitnami/zookeeper:latest
+  service:
+    type: NodePort
+    port: 2181
+    nodePort: 32181
+
+kafka:
+  image: bitnami/kafka:latest
+  service:
+    type: NodePort
+    ports:
+      broker:
+        port: 9092
+        nodePort: 30902
+      host:
+        port: 29092
+        nodePort: 31902
+  config:
+    brokerId: "1"
+    zookeeperConnect: "zookeeper-service:2181"
+    listeners: "PLAINTEXT://:9092,PLAINTEXT_HOST://:29092"
+    advertisedListeners: "PLAINTEXT://kafka-service:9092,PLAINTEXT_HOST://kafka.icoder.vn:29092"
+    listenerSecurityProtocolMap: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+    offsetsTopicReplicationFactor: "1"
+    autoCreateTopicsEnable: "true"
+
+debezium:
+  image: debezium/connect:1.4
+  service:
+    type: NodePort
+    port: 8083
+    nodePort: 32083
+  config:
+    bootstrapServers: "kafka-service:9092"
+    groupId: "1"
+    configStorageTopic: "connect_configs"
+    offsetStorageTopic: "connect_offsets"
+    keyConverter: "io.confluent.connect.avro.AvroConverter"
+    valueConverter: "io.confluent.connect.avro.AvroConverter"
+    keyConverterSchemaRegistryUrl: "http://schema-registry-service:8081"
+    valueConverterSchemaRegistryUrl: "http://schema-registry-service:8081"
+
+schemaRegistry:
+  image: confluentinc/cp-schema-registry:5.5.3
+  service:
+    type: NodePort
+    port: 8081
+    nodePort: 30801
+  config:
+    kafkaStoreConnectionUrl: "zookeeper-service:2181"
+    hostName: "schema-registry"
+    listeners: "http://0.0.0.0:8081"
+
+kafkaUI:
+  image: provectuslabs/kafka-ui:latest
+  service:
+    type: NodePort
+    port: 8080
+    nodePort: 32080
+  config:
+    clusters:
+      - name: "local"
+        bootstrapServers: "kafka-service:9092"
+        zookeeper: "zookeeper-service:2181"

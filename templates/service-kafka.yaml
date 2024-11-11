@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-service
+  labels:
+    app: kafka
+spec:
+  type: {{ .Values.kafka.service.type }}
+  ports:
+    - port: {{ .Values.kafka.service.ports.broker.port }}
+      targetPort: 9092
+      protocol: TCP
+      name: broker
+      nodePort: {{ .Values.kafka.service.ports.broker.nodePort }}
+    - port: {{ .Values.kafka.service.ports.host.port }}
+      targetPort: 29092
+      protocol: TCP
+      name: host
+      nodePort: {{ .Values.kafka.service.ports.host.nodePort }}
+  selector:
+    app: kafka

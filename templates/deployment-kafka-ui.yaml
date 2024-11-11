@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  labels:
+    app: kafka-ui
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: kafka-ui
+  template:
+    metadata:
+      labels:
+        app: kafka-ui
+    spec:
+      containers:
+        - name: kafka-ui
+          image: {{ .Values.kafkaUI.image }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KAFKA_CLUSTERS_0_NAME
+              value: "{{ index .Values.kafkaUI.config.clusters 0 "name" }}"
+            - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+              value: "{{ index .Values.kafkaUI.config.clusters 0 "bootstrapServers" }}"
+            - name: KAFKA_CLUSTERS_0_ZOOKEEPER
+              value: "{{ index .Values.kafkaUI.config.clusters 0 "zookeeper" }}"
