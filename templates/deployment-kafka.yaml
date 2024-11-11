@@ -14,13 +14,15 @@ spec:
       labels:
         app: kafka
     spec:
+      securityContext:
+        fsGroup: 1000  # Đảm bảo group này có quyền truy cập volume
       initContainers:
-        - name: init-kafka
-          image: {{ .Values.kafka.image }}
-          command: ['sh', '-c', 'mkdir -p /bitnami/kafka && chown -R 1001:1001 /bitnami/kafka/* && chmod -R 775 /bitnami/kafka']
+        - name: volume-permission-fix
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /bitnami"]
           volumeMounts:
             - name: kafka-data
-              mountPath: /bitnami/kafka
+              mountPath: /bitnami
       containers:
         - name: kafka
           image: {{ .Values.kafka.image }}
@@ -44,7 +46,7 @@ spec:
               value: "{{ .Values.kafka.config.autoCreateTopicsEnable }}"
           volumeMounts:
             - name: kafka-data
-              mountPath: /bitnami/kafka
+              mountPath: /bitnami
       volumes:
         - name: kafka-data
           persistentVolumeClaim:

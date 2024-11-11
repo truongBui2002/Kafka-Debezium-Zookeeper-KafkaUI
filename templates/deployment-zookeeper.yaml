@@ -14,13 +14,15 @@ spec:
       labels:
         app: zookeeper
     spec:
+      securityContext:
+        fsGroup: 1000  # Đảm bảo group này có quyền truy cập volume
       initContainers:
-        - name: init-zookeeper
-          image: {{ .Values.zookeeper.image }}
-          command: ['sh', '-c', 'mkdir -p /bitnami/zookeeper && chown -R 1001:1001 /bitnami/zookeeper/*']
+        - name: volume-permission-fix
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /bitnami"]
           volumeMounts:
             - name: zookeeper-data
-              mountPath: /bitnami/zookeeper
+              mountPath: /bitnami
       containers:
         - name: zookeeper
           image: {{ .Values.zookeeper.image }}
@@ -33,7 +35,7 @@ spec:
               value: "2181"
           volumeMounts:
             - name: zookeeper-data
-              mountPath: /bitnami/zookeeper
+              mountPath: /bitnami
       volumes:
         - name: zookeeper-data
           persistentVolumeClaim:
