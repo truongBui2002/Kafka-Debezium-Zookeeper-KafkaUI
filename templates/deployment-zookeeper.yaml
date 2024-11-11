@@ -17,7 +17,7 @@ spec:
       initContainers:
         - name: init-zookeeper
           image: {{ .Values.zookeeper.image }}
-          command: ['sh', '-c', 'mkdir -p /bitnami/zookeeper && chown -R 1001:1001 /bitnami/zookeeper']
+          command: ['sh', '-c', 'mkdir -p /bitnami/zookeeper && chown -R 1001:1001 /bitnami/zookeeper/*']
           volumeMounts:
             - name: zookeeper-data
               mountPath: /bitnami/zookeeper
